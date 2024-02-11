@@ -170,7 +170,7 @@ class CLIApp:
             else:
                 cmd_num = int(input_cmd)
             
-            # try:
+            try:
                 if cmd_num == 1:
                     if self.current_user != None:
                         print("You are already logged in!")
@@ -216,5 +216,5 @@ class CLIApp:
                         print("Invalid command number! Please try again!")
                 else:
                     print("Plaese login or register before using this command!")
-            # except Exception:
-            #     print("Something went wrong! Please try again!")
+            except Exception:
+                print("Something went wrong! Please try again!")
