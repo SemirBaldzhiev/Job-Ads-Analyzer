@@ -2,11 +2,17 @@ import requests
 import sqlite3
 from bs4 import BeautifulSoup
 from src.dbsqlite.db_worker import save_company_db
+import os
+from dotenv import load_dotenv
 
-def extract_company():
-    companies_url = "https://dev.bg/company/"
+load_dotenv()
+COMPANY_URL = os.getenv("COMPANY_URL")
 
-    response = requests.get(companies_url)
+def extract_company() -> None:
+    '''
+    Extract all company information
+    '''
+    response = requests.get(COMPANY_URL)
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
@@ -17,7 +23,10 @@ def extract_company():
             company_link = company.find("a").get("href")
             extract_company_info(company_link)
 
-def extract_company_info(company_link):
+def extract_company_info(company_link: str) -> None:
+    '''
+    Extract specific company information
+    '''
     response_company = requests.get(company_link)
             
     if response_company.status_code == 200:
