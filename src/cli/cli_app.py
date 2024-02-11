@@ -26,7 +26,8 @@ class CLIApp:
         print("11. Display full data job ads and companies in terminal")   
         print("12. Recommend jobs")
         print("13. Change password")
-        print("14. Close the program")
+        print("14. Logout")
+        print("15. Close the program")
         print("To use commands from 3 to 6 you shoud be logged in")
         
     def print_heading(self) -> None:
@@ -71,6 +72,14 @@ class CLIApp:
         new_user = User(first_name, last_name, username,email, password, skills)
         new_user.save()
         self.current_user = username
+        print("You are registered successfully!")
+        
+    def logout_cmd(self) -> None:
+        '''
+        Logout command for the CLI
+        '''
+        self.current_user = None
+        print("You are logged out!")
 
     def filter_cmd(self):
         '''
@@ -118,8 +127,7 @@ class CLIApp:
         '''
         old_password = getpass("Enter old password: ")
         new_password = getpass("Enter new password: ")
-        user = User.get_user(self.current_user)
-        if user.change_password(old_password, new_password):
+        if User.change_password(self.current_user, old_password, new_password):
             print("Password changed successfully!")
         else:
             print("Password change failed! Please try again!")
@@ -162,7 +170,7 @@ class CLIApp:
             else:
                 cmd_num = int(input_cmd)
             
-            try:
+            # try:
                 if cmd_num == 1:
                     if self.current_user != None:
                         print("You are already logged in!")
@@ -173,6 +181,9 @@ class CLIApp:
                         print("You are already registered!")
                     else:
                         self.register_cmd()
+                elif cmd_num == 15:
+                    print("Goodbye!")
+                    break
                 elif self.current_user != None:
                     if cmd_num == 3:
                             wordcloud_job_titles()
@@ -198,10 +209,12 @@ class CLIApp:
                     elif cmd_num == 12:
                             self.change_password_cmd()
                     elif cmd_num == 13:
-                        break
+                        self.change_password_cmd()
+                    elif cmd_num == 14:
+                        self.logout_cmd()
                     else:
                         print("Invalid command number! Please try again!")
                 else:
                     print("Plaese login or register before using this command!")
-            except Exception:
-                print("Something went wrong! Please try again!")
+            # except Exception:
+            #     print("Something went wrong! Please try again!")
