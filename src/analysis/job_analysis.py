@@ -2,15 +2,19 @@ import sqlite3
 import pandas as pd
 from wordcloud import WordCloud
 import matplotlib.pyplot as plt
+import os
+from dotenv import load_dotenv
 from src.dbsqlite.db_worker import get_full_data
 
+load_dotenv()
 
+DB_PATH = os.getenv("DB_PATH")
 
 def wordcloud_job_titles() -> None:
     '''
     Generate a word cloud for job titles with interactive visualization
     '''
-    conn = sqlite3.connect('/home/semir/python-project/Job-Ads-Analyzer/src/job_ads.db')
+    conn = sqlite3.connect(os.path.join((str(DB_PATH))))
 
     # Load job data from the database into a DataFrame
     query = """
@@ -36,7 +40,7 @@ def distribution_by_date_posted() -> None:
     '''
     Generate a distribution plot for the number of job ads by date posted
     '''
-    conn = sqlite3.connect('/home/semir/python-project/Job-Ads-Analyzer/src/job_ads.db')
+    conn = sqlite3.connect(os.path.join((str(DB_PATH))))
 
     # Load job data from the database into a DataFrame
     query = """
@@ -58,13 +62,14 @@ def distribution_by_date_posted() -> None:
     conn.close()
     
 
-def filter_job_ads(job_data, **kwargs) -> None:
+def filter_job_ads(**kwargs) -> pd.DataFrame:
     '''
     Filter job ads by different criteria
     '''
-
+    job_data = get_full_data()
     filtered_data = job_data
     for key, value in kwargs.items():
+        print(key, value)
         if value.isnumeric():
             filtered_data = filtered_data[filtered_data[key] == int(value)]
         else:   
@@ -73,7 +78,7 @@ def filter_job_ads(job_data, **kwargs) -> None:
     return filtered_data
 
 
-def sort_ads(data, ascending: bool, *args,):
+def sort_ads(data: pd.DataFrame, ascending: bool, *args) -> pd.DataFrame:
     '''
     Sort job ads by different criteria
     '''
@@ -81,6 +86,23 @@ def sort_ads(data, ascending: bool, *args,):
     sorted_data = data.sort_values(list(args), ascending=ascending)
         
     return sorted_data
+
+
+def remomend_job(user_skills: list) -> list:
+    conn = sqlite3.connect(os.path.join((str(DB_PATH))))
+
+    # Load job data from the database into a DataFrame
+    query = """
+        SELECT j.*
+        FROM JOB_ADS j;
+    """
+    job_data = pd.read_sql_query(query, conn)
+    job_titles = []
+    for skill in user_skills:
+        job_data = job_data[job_data["skills"].str.contains(skill, case=False, regex=False)]
+        job_titles.extend(job_data["title"])
+    
+    return job_titles
 
 if __name__ == "__main__":
     pass    
