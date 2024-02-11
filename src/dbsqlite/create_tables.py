@@ -1,4 +1,10 @@
 import sqlite3
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DB_PATH = os.getenv("DB_PATH")
 
 sql_jobs = '''
     CREATE TABLE JOB_ADS (
@@ -36,13 +42,12 @@ sql_users = '''
         );
 '''
 
-con = sqlite3.connect("../job_ads.db")
+con = sqlite3.connect(os.path.join((str(DB_PATH))))
 cursor = con.cursor()
 
 cursor.execute(sql_companies)
 cursor.execute(sql_jobs)
 cursor.execute(sql_users)
-
 
 cursor.close()
 con.close()
