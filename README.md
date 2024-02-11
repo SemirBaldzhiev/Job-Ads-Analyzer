@@ -25,6 +25,8 @@ Job Ads Analyzer is a tool that allows users to analyze and explore job advertis
     ```
 2. Install dependencies:
     ```bash
+    # create virtual environment
+    python3 -m venv .venv 
     pip install -r requirements.txt
     ```
 3. Set up the database:
