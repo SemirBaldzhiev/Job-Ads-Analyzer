@@ -39,11 +39,11 @@ def extract_company_info(company_link: str) -> None:
             company_name = company_name.text.strip()
         company_details = soup_company.find_all("div", {"class": "box-company-info"})
         
-        cnt_employees2 = company_details[1].find("p", {"class": "p-big-18 bold without-margin"}).text.strip().replace("-", "").replace("+", "").split(" ")
-        if len(cnt_employees2) > 1 and not cnt_employees2[0].isnumeric():
-            cnt_employees2 = int("".join(cnt_employees2[1:]))
+        cnt_employees = company_details[1].find("p", {"class": "p-big-18 bold without-margin"}).text.strip().replace("-", "").replace("+", "").split(" ")
+        if len(cnt_employees) > 1 and not cnt_employees[0].isnumeric():
+            cnt_employees = int("".join(cnt_employees[1:]))
         else:
-            cnt_employees2 = int("".join(cnt_employees2))
+            cnt_employees = int("".join(cnt_employees))
         
         year_founded = company_details[0].find("p", {"class": "p-big-18 bold without-margin"}).text.strip().split(" ")[0]
         if year_founded.isnumeric():
@@ -59,7 +59,7 @@ def extract_company_info(company_link: str) -> None:
         else:
             cnt_job_ads = 0
 
-        save_company_db((company_name, location, cnt_job_ads, cnt_employees2, year_founded))
+        save_company_db((company_name, location, cnt_job_ads, cnt_employees, year_founded))
         
 
 
