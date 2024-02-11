@@ -30,6 +30,13 @@ Job Ads Analyzer is a tool that allows users to analyze and explore job advertis
 3. Set up the database:
     - Initialize your SQLite database with job ads and company data.
     ```bash
+    touch .env #create .env file
+
+    # add this lines in the file .env and chnage db path to desired from you location 
+    # DB_PATH="/home/semir/python-project/Job-Ads-Analyzer/src/job_ads.db"
+    # COMPANY_URL="https://dev.bg/company/"
+    # SITE_URL="https://dev.bg"
+
     cd src/dbsqlite
     python3 create_tables.py
     cd ../../
