@@ -1,5 +1,5 @@
 from hashlib import sha256
-from src.dbsqlite.db_worker import save_user_db, check_password_username
+from src.dbsqlite.db_worker import save_user_db, check_password_username, chnage_password_db
 
 class User:
     '''
@@ -30,6 +30,7 @@ class User:
         '''
         if self.password == sha256(old_password.encode()).hexdigest():
             self.password = sha256(new_password.encode()).hexdigest()
+            chnage_password_db((self.password, self.username))
             return True
         return False
 
