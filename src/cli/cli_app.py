@@ -2,14 +2,16 @@ from src.user.user import User
 from getpass import getpass
 from src.analysis.job_analysis import *
 from src.analysis.company_analysis import *
-from src.dbsqlite.db_worker import get_all_job_data, get_all_company_data, get_full_data
-
+from src.dbsqlite.db_worker import get_all_job_data, get_all_company_data, get_full_data, get_user_skills
 
 class CLIApp:    
     def __init__(self):
         self.current_user = None
     
     def menu(self) -> None:
+        '''
+        Print menu for the CLI
+        '''
         print("Commands:")
         print("1.  Login")
         print("2.  Register")
@@ -21,11 +23,16 @@ class CLIApp:
         print("8.  Company distribution by date founded")
         print("9.  Display job data in terminal")
         print("10. Display company data in terminal")
-        print("11. Display full data job ads and companies in terminal")        
-        print("12. Close the program")
+        print("11. Display full data job ads and companies in terminal")   
+        print("12. Recommend jobs")
+        print("13. Change password")
+        print("14. Close the program")
         print("To use commands from 3 to 6 you shoud be logged in")
         
     def print_heading(self) -> None:
+        '''
+        Print heading for the CLI
+        '''
         print("=====================================================")
         print("=========Welcome to the Job Ads Analyzer CLI=========")
         print("=====================================================")
@@ -34,6 +41,9 @@ class CLIApp:
         
 
     def login_cmd(self) -> None:
+        '''
+        Login command for the CLI
+        '''
         while (True):
             input_username = input("Username: ")
             input_password = getpass("Password: ")
@@ -47,8 +57,10 @@ class CLIApp:
                 exit = input("Do you want to exit login (yes/no)? ")
                 if exit.lower() == "yes":
                     break
-    def register_cmd(self):
-        
+    def register_cmd(self) -> None:
+        '''
+        Register command for the CLI
+        '''
         first_name = input("Enter First Name: ")
         last_name = input("Enter Last Name: ")
         username = input("Enter username: ")
@@ -61,14 +73,20 @@ class CLIApp:
         self.current_user = username
 
     def filter_cmd(self):
+        '''
+        Filter command for the CLI
+        '''
         filter_criteria = input("Enter filter criteria in the format <key=\"value\"> exp: title=\"София\": ")
         filter_criteria = filter_criteria.split(", ")
-        kwargs = {filter.slpit("=")[0]: filter.split("=")[1] for filter in filter_criteria}
-        data = get_full_data()
-        filtered_data = filter_job_ads(data, kwargs)
+        kwargs = {filter.split("=")[0]: filter.split("=")[1] for filter in filter_criteria}
+        print(kwargs)
+        filtered_data = filter_job_ads(**kwargs)
         print(filtered_data)
 
     def sort_cmd(self):
+        '''
+        Sort command for the CLI
+        '''
         while (True):
             input_order = input("Enter order ascending/descending: ")
             if input_order.lower() == "ascending" or input_order.lower() == "descending":
@@ -84,23 +102,65 @@ class CLIApp:
         sorted_data = sort_ads(data, order_asc, columns_sorted)
         print(sorted_data)
 
+    def recommend_jobs_cmd(self):
+        '''
+        Recommend jobs for the current logged in user
+        '''
+        
+        user_skills = get_user_skills(self.current_user)
+        print(user_skills)
+        recommended_jobs = remomend_job(user_skills[0].split(","))
+        print(recommended_jobs)
+    
+    def change_password_cmd(self):
+        '''
+        Change password for the current logged in user
+        '''
+        old_password = getpass("Enter old password: ")
+        new_password = getpass("Enter new password: ")
+        user = User.get_user(self.current_user)
+        if user.change_password(old_password, new_password):
+            print("Password changed successfully!")
+        else:
+            print("Password change failed! Please try again!")
+    
     def display_job_data_in_terminal(self):
+        '''
+        Display job data in terminal
+        '''
         data = get_all_job_data()
         print(data)
     
     def display_company_data_in_terminal(self):
+        '''
+        Display company data in terminal
+        '''
         data = get_all_company_data()
         print(data)
     
     def display_full_data(self):
+        '''
+        Display full data job ads and companies in terminal
+        '''
         data = get_full_data()
         print(data)
     
     def run(self):
+        '''
+        Run all commands intercatively
+        '''
         self.print_heading()
         while(True):
             input_cmd = input("Enter command number: ")
-            cmd_num = int(input_cmd)
+            
+            if input_cmd == "":
+                continue
+            
+            if input_cmd.isnumeric() == False:
+                print("Please enter a valid command number!")
+                continue
+            else:
+                cmd_num = int(input_cmd)
             
             try:
                 if cmd_num == 1:
@@ -113,54 +173,35 @@ class CLIApp:
                         print("You are already registered!")
                     else:
                         self.register_cmd()
-                elif cmd_num == 3:
-                    if self.current_user == None:
-                        print("Plaese login or register before using this command!")
+                elif self.current_user != None:
+                    if cmd_num == 3:
+                            wordcloud_job_titles()
+                    elif cmd_num == 4:
+                            self.filter_cmd()
+                    elif cmd_num == 5:
+                            self.sort_cmd()
+                    elif cmd_num == 6: 
+                            distribution_by_date_posted()
+                    elif cmd_num == 7:
+                            distribution_by_cnt_ads()
+                    elif cmd_num == 8:
+                            distribution_by_date_founded()
+                    elif cmd_num == 9:
+                            self.display_job_data_in_terminal()
+                    elif cmd_num == 10:
+                            self.display_company_data_in_terminal()
+                    elif cmd_num == 11:
+
+                            self.display_full_data()
+                    elif cmd_num == 12:
+                            self.recommend_jobs_cmd()
+                    elif cmd_num == 12:
+                            self.change_password_cmd()
+                    elif cmd_num == 13:
+                        break
                     else:
-                        wordcloud_job_titles()
-                elif cmd_num == 4:
-                    if self.current_user == None:
-                        print("Plaese login or register before using this command!")
-                    else:
-                        self.filter_cmd()
-                elif cmd_num == 5:
-                    if self.current_user == None:
-                        print("Plaese login or register before using this command!")
-                    else:
-                        self.sort_cmd()
-                elif cmd_num == 6:
-                    if self.current_user == None:
-                        print("Plaese login or register before using this command!")
-                    else:   
-                        distribution_by_date_posted()
-                elif cmd_num == 7:
-                    if self.current_user == None:
-                        print("Plaese login or register before using this command!")
-                    else:
-                        distribution_by_cnt_ads()
-                elif cmd_num == 8:
-                    if self.current_user == None:
-                        print("Plaese login or register before using this command!")
-                    else:
-                        distribution_by_date_founded()
-                elif cmd_num == 9:
-                    if self.current_user == None:
-                        print("Plaese login or register before using this command!")
-                    else:
-                        self.display_job_data_in_terminal()
-                elif cmd_num == 10:
-                    if self.current_user == None:
-                        print("Plaese login or register before using this command!")
-                    else:
-                        self.display_company_data_in_terminal()
-                elif cmd_num == 11:
-                    if self.current_user == None:
-                        print("Plaese login or register before using this command!")
-                    else:
-                        self.display_full_data()
-                elif cmd_num == 12:
-                    exit()
+                        print("Invalid command number! Please try again!")
                 else:
-                    print("Invalid command number! Please try again!")
+                    print("Plaese login or register before using this command!")
             except Exception:
                 print("Something went wrong! Please try again!")
