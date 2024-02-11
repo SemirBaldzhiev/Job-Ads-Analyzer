@@ -1,8 +1,14 @@
 import sqlite3
 import pandas as pd
+import os
+from dotenv import load_dotenv
 
-def save_user_db(user_info):
-    con = sqlite3.connect("/home/semir/python-project/Job-Ads-Analyzer/src/job_ads.db")
+load_dotenv()
+
+DB_PATH = os.getenv("DB_PATH")
+
+def save_user_db(user_info) -> None:
+    con = sqlite3.connect(os.path.join((str(DB_PATH))))
     cursor = con.cursor()
     insert_stmn = '''
             INSERT INTO USERS (first_name, last_name, username, email, password, skills)
@@ -13,8 +19,8 @@ def save_user_db(user_info):
     cursor.close()
     con.close()
     
-def save_company_db(company_info):
-    con = sqlite3.connect("../job_ads.db")
+def save_company_db(company_info) -> None:
+    con = sqlite3.connect(os.path.join((str(DB_PATH))))
     cursor = con.cursor()
     insert_stmn = '''
             INSERT INTO COMPANIES (name, location, cnt_job_ads, cnt_employees, year_founded)
@@ -26,8 +32,8 @@ def save_company_db(company_info):
     con.close()
 
 
-def check_password_username(username, password):
-    con = sqlite3.connect("/home/semir/python-project/Job-Ads-Analyzer/src/job_ads.db")
+def check_password_username(username, password) -> bool:
+    con = sqlite3.connect(os.path.join((str(DB_PATH))))
     cursor = con.cursor()
     
     select = "SELECT password FROM USERS WHERE username = ? and password = ?"
@@ -41,11 +47,11 @@ def check_password_username(username, password):
     
     return False
 
-def get_all_job_data():
+def get_all_job_data() -> pd.DataFrame:
     '''
     Get all job ads data
     '''
-    conn = sqlite3.connect('/home/semir/python-project/Job-Ads-Analyzer/src/job_ads.db')
+    conn = sqlite3.connect(os.path.join((str(DB_PATH))))
 
     query = """
         SELECT j.title, j.date_posted, c.name AS company_name, c.location AS company_location
@@ -63,7 +69,7 @@ def get_full_data() -> pd.DataFrame:
     '''
     Get full data
     '''
-    conn = sqlite3.connect('/home/semir/python-project/Job-Ads-Analyzer/src/job_ads.db')
+    conn = sqlite3.connect(os.path.join((str(DB_PATH))))
 
     query = """
         SELECT j.*, c.*
@@ -77,8 +83,8 @@ def get_full_data() -> pd.DataFrame:
     return job_data
 
 
-def get_all_company_data():
-    conn = sqlite3.connect('/home/semir/python-project/Job-Ads-Analyzer/src/job_ads.db')
+def get_all_company_data() -> None:
+    conn = sqlite3.connect(os.path.join((str(DB_PATH))))
 
     query = """
         SELECT c.*
@@ -88,3 +94,33 @@ def get_all_company_data():
     
     return job_data
 
+def get_user_skills(username) -> None:
+    '''
+    Get user skills by username
+    '''
+    conn = sqlite3.connect(os.path.join((str(DB_PATH))))
+    cursor = conn.cursor()
+    query = """
+        SELECT u.skills
+        FROM USERS u WHERE u.username = ?;
+    """
+    cursor.execute(query, (username,))
+    user_skills = cursor.fetchone()
+    
+    cursor.close()
+    conn.close()
+    
+    return user_skills
+
+def chnage_password_db(user_info: tuple) -> None:
+    con = sqlite3.connect(os.path.join((str(DB_PATH))))
+    cursor = con.cursor()
+    update_stmn = '''
+            UPDATE USERS
+            SET password = ?
+            WHERE username = ?;
+        '''
+    cursor.execute(update_stmn, user_info)
+    con.commit()
+    cursor.close()
+    con.close()
