@@ -57,5 +57,5 @@ Job Ads Analyzer is a tool that allows users to analyze and explore job advertis
     ```
 
 ## License
-This project is licensed under the [MIT License](LICENSE).
+This project is licensed under the [Apache License](LICENSE).
 
