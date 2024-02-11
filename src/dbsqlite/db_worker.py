@@ -124,3 +124,15 @@ def chnage_password_db(user_info: tuple) -> None:
     con.commit()
     cursor.close()
     con.close()
+    
+def get_password_db(username) -> str:
+    print(username)
+    con = sqlite3.connect(os.path.join((str(DB_PATH))))
+    cursor = con.cursor()
+    select = "SELECT password FROM USERS WHERE username = ?"
+    cursor.execute(select, (username,))
+    password = cursor.fetchone()
+    cursor.close()
+    con.close()
+    print(password)
+    return password[0]
