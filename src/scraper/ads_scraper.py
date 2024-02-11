@@ -4,18 +4,21 @@ from bs4 import BeautifulSoup
 from datetime import datetime
 import math
 from company_scraper import extract_company_info
+import os
+from dotenv import load_dotenv
 
+load_dotenv()
 
-con = sqlite3.connect("../job_ads.db")
+DB_PATH = os.getenv("DB_PATH")
+SITE_URL = os.getenv("SITE_URL")
+COMPANY_URL = os.getenv("COMPANY_URL")
+
+con = sqlite3.connect(os.path.join((str(DB_PATH))))
 cursor = con.cursor()
 
-comany_url = "https://dev.bg/company/"
+def extract_job_ads() -> None:
 
-def extract_job_ads():
-
-    url = "https://www.dev.bg"
-
-    response = requests.get(url)
+    response = requests.get(SITE_URL)
 
     if response.status_code == 200:
         soup = BeautifulSoup(response.text, "html.parser")
@@ -26,7 +29,7 @@ def extract_job_ads():
         
     close_connection(cursor, con)
                     
-def extract_jobs(links, jobs_cnt):
+def extract_jobs(links, jobs_cnt) -> None:
     for link, cnt in zip(links, jobs_cnt):
         max_pages = math.ceil(int(cnt.text.strip()) / 20)
         print(max_pages)
@@ -34,7 +37,7 @@ def extract_jobs(links, jobs_cnt):
         if NUM_ADS == 100:
             return
 
-def extract_jobs_by_pages(link, max_pages):    
+def extract_jobs_by_pages(link, max_pages: int) -> None:
     for pages_cnt in range(1, max_pages):
             
         if pages_cnt == 1:
@@ -55,7 +58,10 @@ def extract_jobs_by_pages(link, max_pages):
                 return
             
 
-def get_job_links(job_items):
+def get_job_links(job_items) -> list:
+    '''
+    Get job ads links
+    '''
     job_links = []
     for item in job_items:
         job_div = item.find("div", {"class": "inner-right listing-content-wrap"})
@@ -64,7 +70,10 @@ def get_job_links(job_items):
     return job_links
 
 
-def extract_jobs_description(job_links):
+def extract_jobs_description(job_links) -> None:
+    '''
+    Extract job ads description
+    '''
     global NUM_ADS
     for job_link in job_links:
         print(job_link)
@@ -93,7 +102,7 @@ def extract_jobs_description(job_links):
         
         if company_id is None:
             company_link = company_name.replace(" ", "-").lower()
-            extract_company_info(comany_url + company_link)
+            extract_company_info(COMPANY_URL + company_link)
             company_id = cursor.execute("SELECT id FROM COMPANIES WHERE name = ?", (company_name,)).fetchone()
         
         if company_id is None: continue
@@ -105,14 +114,20 @@ def extract_jobs_description(job_links):
         if NUM_ADS == 100:
             return
         
-def extract_skills(skills):
+def extract_skills(skills) -> list:
+    '''
+    Extract skills from job ad
+    '''
     list_skills = []
     for skill in skills:
         skill_name = skill.find("img")["title"]
         list_skills.append(skill_name)
     return list_skills
     
-def save_job_db(job_info):
+def save_job_db(job_info) -> None:
+    '''
+    Save job ad in the database
+    '''
     insert_stmn = '''
         INSERT INTO JOB_ADS (title, description, company_id, date_posted, link, skills)
         VALUES (?, ?, ?, ?, ?, ?);
@@ -120,12 +135,13 @@ def save_job_db(job_info):
     cursor.execute(insert_stmn, job_info)
     con.commit()
 
-def close_connection(cursor, con):
+def close_connection(cursor, con) -> None:
+    '''
+    Close connection to the database
+    '''
     cursor.close()
     con.close()
 
-# def open_connection():
-#     return cursor, con
 
 if __name__ == "__main__":
     NUM_ADS = 0
