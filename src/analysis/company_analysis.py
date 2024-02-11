@@ -1,11 +1,17 @@
 import sqlite3
 import pandas as pd
 import matplotlib.pyplot as plt
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+DB_PATH = os.getenv("DB_PATH")
 
 
 def distribution_by_cnt_ads():
     
-    conn = sqlite3.connect('/home/semir/python-project/Job-Ads-Analyzer/src/job_ads.db')
+    conn = sqlite3.connect(os.path.join((str(DB_PATH))))
 
     query = """
         SELECT c.*
@@ -26,11 +32,11 @@ def distribution_by_cnt_ads():
     plt.tight_layout()
 
     plt.show()
-    
+    conn.close()
 
 def distribution_by_date_founded():
     
-    conn = sqlite3.connect('/home/semir/python-project/Job-Ads-Analyzer/src/job_ads.db')
+    conn = sqlite3.connect(os.path.join((str(DB_PATH))))
 
     query = """
         SELECT c.*
@@ -56,6 +62,8 @@ def distribution_by_date_founded():
     plt.tight_layout()
 
     plt.show()
+    
+    conn.close()
 
 
 if __name__ == "__main__":
