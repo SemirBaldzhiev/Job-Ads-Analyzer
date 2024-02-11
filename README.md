@@ -46,6 +46,7 @@ Job Ads Analyzer is a tool that allows users to analyze and explore job advertis
 4. Scrape data for job ads and companies
     - This commands will take more time for execution
     ```bash
+    export PYTHONPATH="$PYTHONPATH:$PWD"
     cd src/scraper
     python3 company_scraper.py
     python3 ads_scraper.py
