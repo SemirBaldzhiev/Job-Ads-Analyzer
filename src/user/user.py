@@ -1,5 +1,5 @@
 from hashlib import sha256
-from src.dbsqlite.db_worker import save_user_db, check_password_username, chnage_password_db
+from src.dbsqlite.db_worker import save_user_db, check_password_username, chnage_password_db, get_password_db
 
 class User:
     '''
@@ -24,17 +24,17 @@ class User:
             return True
         return False
     
-    def change_password(self, old_password, new_password) -> bool:
+    @staticmethod
+    def change_password(current_user, old_password, new_password) -> bool:
         '''
         Method for changing user password
         '''
-        if self.password == sha256(old_password.encode()).hexdigest():
-            self.password = sha256(new_password.encode()).hexdigest()
-            chnage_password_db((self.password, self.username))
+        if get_password_db(current_user) == sha256(old_password.encode()).hexdigest():
+            chnage_password_db((sha256(new_password.encode()).hexdigest(), current_user))
             return True
         return False
 
-    
+
     def save(self) -> None:
         '''
         Method for saving user to the database
