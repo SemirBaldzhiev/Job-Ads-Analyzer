@@ -28,7 +28,7 @@ class CLIApp:
         print("13. Change password")
         print("14. Logout")
         print("15. Close the program")
-        print("To use commands from 3 to 6 you shoud be logged in")
+        print("To use commands from 3 to 14 you shoud be logged in")
         
     def print_heading(self) -> None:
         '''
@@ -85,7 +85,7 @@ class CLIApp:
         '''
         Filter command for the CLI
         '''
-        filter_criteria = input("Enter filter criteria in the format <key=\"value\"> exp: title=\"София\": ")
+        filter_criteria = input("Enter filter criteria in the format <key=value> exp: title=Java, location=София: ")
         filter_criteria = filter_criteria.split(", ")
         kwargs = {filter.split("=")[0]: filter.split("=")[1] for filter in filter_criteria}
         print(kwargs)
